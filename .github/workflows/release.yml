@@ -1,0 +1,149 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Tag name (e.g. v1.0.0)'
+        required: false
+        default: 'v1.0.0'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact_name: apex-overdrive-linux-x64
+            archive_ext: tar.gz
+          - os: windows-latest
+            artifact_name: apex-overdrive-windows-x64
+            archive_ext: zip
+          - os: macos-latest
+            artifact_name: apex-overdrive-macos-x64
+            archive_ext: zip
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Build executable with PyInstaller
+        run: |
+          pyinstaller ApexOverdrive.spec --noconfirm
+
+      - name: Package Linux Archive
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          tar -czvf ${{ matrix.artifact_name }}.tar.gz -C dist ApexOverdrive
+
+      - name: Package Windows Archive
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          Compress-Archive -Path dist/ApexOverdrive -DestinationPath ${{ matrix.artifact_name }}.zip
+
+      - name: Package macOS Archive
+        if: matrix.os == 'macos-latest'
+        run: |
+          ditto -c -k --sequesterRsrc --keepParent dist/ApexOverdrive ${{ matrix.artifact_name }}.zip
+
+      - name: Upload Binary Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: ${{ matrix.artifact_name }}.${{ matrix.archive_ext }}
+
+  publish:
+    name: Publish GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Generate Release Screenshots
+        run: |
+          python main.py --shot screenshot_title.png --title
+          python main.py --shot screenshot_gameplay.png --frames 200
+
+      - name: Package Universal Source Archive
+        run: |
+          zip -r apex-overdrive-source.zip apex assets brand sheets tools main.py requirements.txt Makefile README.md LICENSE
+
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist-release
+          merge-multiple: true
+
+      - name: List Release Files
+        run: |
+          ls -lh dist-release/
+          ls -lh *.png *.zip
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_type == 'tag' && github.ref_name || inputs.tag_name }}
+          name: APEX OVERDRIVE ${{ github.ref_type == 'tag' && github.ref_name || inputs.tag_name }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          body: |
+            ## APEX OVERDRIVE 🏁
+
+            Retro-pixel pseudo-3D street racer featuring high-speed police pursuits, dynamic traffic AI, synthwave soundtrack, and customizable themes.
+
+            ### Downloads
+            - **Windows (x64)**: `apex-overdrive-windows-x64.zip` (extract & run `ApexOverdrive.exe`)
+            - **Linux (x64)**: `apex-overdrive-linux-x64.tar.gz` (extract & run `./ApexOverdrive`)
+            - **macOS (x64/ARM)**: `apex-overdrive-macos-x64.zip` (extract & run `./ApexOverdrive`)
+            - **Universal Python Archive**: `apex-overdrive-source.zip` (requires Python 3.10+ & `pip install -r requirements.txt`)
+
+            ### Controls
+            | Key | Action |
+            |---|---|
+            | **Arrow Keys / WASD** | Steer, Accelerate, Brake |
+            | **Space / Shift** | Nitro Boost |
+            | **P / Esc** | Pause |
+            | **M** | Mute Audio |
+            | **C** | Toggle CRT Scanlines |
+            | **F** | Fullscreen Toggle |
+            | **Enter** | Start / Retry |
+          files: |
+            dist-release/*
+            apex-overdrive-source.zip
+            screenshot_title.png
+            screenshot_gameplay.png

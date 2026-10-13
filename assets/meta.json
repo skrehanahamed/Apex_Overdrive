@@ -1,0 +1,162 @@
+{
+ "hero_rear": [
+  562,
+  332
+ ],
+ "hero_brake": [
+  562,
+  332
+ ],
+ "hero_left": [
+  632,
+  332
+ ],
+ "hero_right": [
+  632,
+  333
+ ],
+ "traffic_sedan": [
+  394,
+  278
+ ],
+ "traffic_sports": [
+  419,
+  250
+ ],
+ "traffic_van": [
+  401,
+  391
+ ],
+ "traffic_truck": [
+  425,
+  432
+ ],
+ "traffic_taxi": [
+  384,
+  322
+ ],
+ "traffic_suv": [
+  436,
+  384
+ ],
+ "police_a": [
+  423,
+  308
+ ],
+ "police_b": [
+  423,
+  309
+ ],
+ "police_front": [
+  436,
+  307
+ ],
+ "traffic_cone": [
+  246,
+  300
+ ],
+ "nitro_can": [
+  300,
+  343
+ ],
+ "nitro_flames": [
+  512,
+  363
+ ],
+ "roadblock": [
+  763,
+  292
+ ],
+ "billboard": [
+  600,
+  428
+ ],
+ "highway_sign": [
+  732,
+  393
+ ],
+ "explosion": [
+  593,
+  458
+ ],
+ "lamp_post_a": [
+  312,
+  762
+ ],
+ "palm_a": [
+  381,
+  822
+ ],
+ "building_a": [
+  275,
+  901
+ ],
+ "building_b": [
+  318,
+  779
+ ],
+ "lamp_post": [
+  313,
+  788
+ ],
+ "palm_b": [
+  404,
+  830
+ ],
+ "building_c": [
+  280,
+  891
+ ],
+ "building_d": [
+  344,
+  792
+ ],
+ "hud_gauge": [
+  432,
+  420
+ ],
+ "hud_bar": [
+  671,
+  116
+ ],
+ "hud_mirror": [
+  692,
+  294
+ ],
+ "hud_panel": [
+  644,
+  205
+ ],
+ "overdrive": [
+  2000,
+  208
+ ],
+ "sky_sunset": {
+  "horizon": 0.751,
+  "size": [
+   1536,
+   1024
+  ]
+ },
+ "sky_midnight": {
+  "horizon": 0.699,
+  "size": [
+   1536,
+   1024
+  ]
+ },
+ "sky_dawn": {
+  "horizon": 0.749,
+  "size": [
+   1536,
+   1024
+  ]
+ },
+ "sky_vapor": {
+  "horizon": 0.697,
+  "size": [
+   1536,
+   1024
+  ]
+ }
+}
